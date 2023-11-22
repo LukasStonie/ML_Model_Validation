@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("./_lib/")
 
 import argparse
@@ -17,7 +18,7 @@ from _lib.raman_lib.opus_converter import convert_opus
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-logdir  = Path("./log/01_create_dataset/")
+logdir = Path("./log/01_create_dataset/")
 
 if not os.path.exists(logdir):
     os.makedirs(logdir)
@@ -39,6 +40,7 @@ handler_f.setFormatter(format_f)
 
 logger.addHandler(handler_c)
 logger.addHandler(handler_f)
+
 
 def create_dataset(dirs_in, labels, grouped=False):
     logger.info("Loading data")
@@ -78,9 +80,11 @@ def create_dataset(dirs_in, labels, grouped=False):
             data.append(filedata[:, 1])
             files.append(file)
             if grouped is True:
-                groups.append(int(file.name[0]))
-
-
+                # for HL_540:
+                parts = str(file.name).split(".")
+                groups.append(int(parts[0][-1]))
+                # for HL_428:
+                # groups.append(int(str(file.name).lstrip("RE")[0]))
 
     if not all([np.array_equal(element, wns[0]) for element in wns]):
         raise ValueError("Wavenumber values are not the same in all files.")
@@ -91,7 +95,7 @@ def create_dataset(dirs_in, labels, grouped=False):
     data.insert(0, "label", lab)
     data.insert(1, "file", files)
     if grouped is True:
-        data.insert(2,"group", groups)
+        data.insert(2, "group", groups)
 
     logger.info("Finished loading data.")
     return data
@@ -104,9 +108,11 @@ if __name__ == "__main__":
     )
 
     parser.add_argument("-d", "--dir", metavar="PATH", type=str, nargs="+", action="store",
-                        help="Directories containing the Raman spectra as csv files. Each directory should contain one class.", required=True)
+                        help="Directories containing the Raman spectra as csv files. Each directory should contain one class.",
+                        required=True)
     parser.add_argument("-l", "--label", metavar="NAME", type=str, nargs="+", action="store",
-                        help="Labels for the classes. Must have the same number of entries as '--dir'. If not provided, the directory names will be used.", required=False)
+                        help="Labels for the classes. Must have the same number of entries as '--dir'. If not provided, the directory names will be used.",
+                        required=False)
     parser.add_argument("-o", "--out", metavar="PATH", type=str,
                         action="store", help="Output path for the merged csv file", required=True)
 

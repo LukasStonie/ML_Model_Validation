@@ -25,7 +25,7 @@ def load_data(path, grouped = False):
         for path_inner in os.listdir(path):
             for file in os.listdir(os.path.join(path, path_inner)):
                 filepath = os.path.join(path, path_inner, file)
-                print(path_inner)
+                # print(path_inner)
                 if filepath.lower().endswith(".csv"):
                     try:
                         spectrum = np.loadtxt(filepath, delimiter=",")
